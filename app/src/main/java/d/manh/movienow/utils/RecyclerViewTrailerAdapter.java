@@ -11,16 +11,18 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import d.manh.moviewnow.R;
+import d.manh.movienow.R;
+import d.manh.movienow.data.StoreContract;
+import d.manh.movienow.models.Trailer;
 
 public class RecyclerViewTrailerAdapter extends RecyclerView.Adapter<RecyclerViewTrailerAdapter.TrailerViewHolder> {
     final private ListItemClickListener trailersOnClickListener;
     private Context context;
-    private List<Trailer> listTrailers;
+    private ArrayList<Trailer> listTrailers;
 
-    public RecyclerViewTrailerAdapter(ListItemClickListener listItemClickListener, List<Trailer> trailers){
+    public RecyclerViewTrailerAdapter(ListItemClickListener listItemClickListener, ArrayList<Trailer> trailers){
         this.listTrailers = trailers;
         this.trailersOnClickListener = listItemClickListener;
     }
@@ -37,12 +39,13 @@ public class RecyclerViewTrailerAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public void onBindViewHolder(@NonNull TrailerViewHolder holder, int position) {
-        String url = StoreContract.URL_YOUTUBE +listTrailers.get(position).getTrailerKey() + StoreContract.URL_YOUTUBE_PATH;
+        String url = StoreContract.URL_YOUTUBE +listTrailers.get(position).getKey() + StoreContract.URL_YOUTUBE_PATH;
         Picasso.with(context).load(url).into(holder.ivTrailersThumb);
     }
 
     @Override
     public int getItemCount() {
+        if(listTrailers == null) return 0;
         return listTrailers.size();
     }
 

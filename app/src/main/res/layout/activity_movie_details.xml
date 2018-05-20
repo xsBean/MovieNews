@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="d.manh.movienow.MovieDetails">
+    tools:context="d.manh.movienow.MovieDetailsActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar"
@@ -29,6 +29,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scrolling_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
@@ -68,24 +69,39 @@
                 android:id="@+id/tv_summary_detail"
                 android:textSize="12sp"/>
             <TextView
+                android:id="@+id/trailers_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:text="@string/trailers"/>
+            <include
+                layout="@layout/trailers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
             <TextView
+                android:id="@+id/reviews_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:text="@string/review_tag"/>
+            <include
+                layout="@layout/reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/favorite_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="end|bottom"
-        android:src="@drawable/ic_favorite_white_24dp"
-        android:layout_margin="24dp"
-        android:clickable="true"
-        android:focusable="true" />
+        android:id="@+id/fb_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_favorite_border_white_24dp"
+        app:elevation="6dp"
+        app:layout_anchor="@id/scrolling_container"
+        app:layout_anchorGravity="bottom|right|end"
+        app:pressedTranslationZ="12dp"
+        app:rippleColor="@android:color/white"/>
+
 </android.support.design.widget.CoordinatorLayout>

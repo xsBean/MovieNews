@@ -3,18 +3,19 @@ package d.manh.movienow.utils;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import d.manh.movienow.data.StoreContract;
+import d.manh.movienow.models.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import d.manh.moviewnow.R;
+import d.manh.movienow.R;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder>{
     private Context context;
@@ -38,7 +39,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-
+//        holder.ivImageMovie.setImageResource(R.);
+//        String url =  "http://image.tmdb.org/t/p/w185/"+listMovie.get(position).getPosterPath();
+//        Log.v("URL",url);
         String url = StoreContract.URL_IMAGE + StoreContract.URL_PATH_POSTER_SIZE +listMovie.get(position).getPosterPath();
         Picasso.with(context).load(url).into(holder.ivImageMovie);
         holder.tvMovieTitle.setText(listMovie.get(position).getTitle());
@@ -46,11 +49,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return listMovie.size();
+        if(listMovie == null) return 0;
+        else return listMovie.size();
     }
 
 
-    protected class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
+    public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
         ImageView ivImageMovie;
         TextView tvMovieTitle;
 

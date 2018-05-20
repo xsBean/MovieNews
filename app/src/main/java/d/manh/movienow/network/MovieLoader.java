@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import d.manh.movienow.utils.Movie;
+import d.manh.movienow.models.Movie;
 import d.manh.movienow.utils.QueryUtils;
 
 public class MovieLoader extends AsyncTaskLoader<List<Movie>> {

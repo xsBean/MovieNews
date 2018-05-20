@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="d.manh.moviewnow">
+    package="d.manh.movienow">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -15,7 +15,7 @@
         <activity
             android:name="d.manh.movienow.MainActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,8 +24,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="d.manh.movienow.MovieDetails"
+            android:name="d.manh.movienow.MovieDetailsActivity"
             android:parentActivityName="d.manh.movienow.MainActivity"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

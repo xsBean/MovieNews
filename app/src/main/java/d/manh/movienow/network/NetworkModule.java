@@ -18,15 +18,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import d.manh.movienow.MainActivity;
-import d.manh.movienow.MovieDetails;
+import d.manh.movienow.MovieDetailsActivity;
 import d.manh.movienow.utils.ListItemClickListener;
-import d.manh.movienow.utils.Movie;
+import d.manh.movienow.models.Movie;
 import d.manh.movienow.utils.RecyclerViewAdapter;
-import d.manh.movienow.utils.StoreContract;
-import d.manh.moviewnow.R;
+import d.manh.movienow.data.StoreContract;
+import d.manh.movienow.R;
 
 public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>, ListItemClickListener {
-
     private String TAG = "NetworkModule";
     private RecyclerView recyclerViewMainMovie;
     private List<Movie> listMovie = new ArrayList<>();
@@ -38,6 +37,7 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
     private ProgressBar loadingIndicator;
     private URL url;
     private int option;
+    private LoaderManager loaderManager;
 
     // Store a member variable for the listener
     private boolean itShouldLoadMore = true;
@@ -47,7 +47,7 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
         this.view = view;
         this.activity = activity;
         this.context = context;
-
+        loaderManager = activity.getLoaderManager();
         tvErrorMessage = view.findViewById(R.id.tv_error_message);
         loadingIndicator =  view.findViewById(R.id.pb_loading_indicator);
         recyclerViewMainMovie = view.findViewById(R.id.rv_contain_main);
@@ -58,7 +58,7 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
         recyclerViewMainMovie.setHasFixedSize(true);
         rvAdapter = new RecyclerViewAdapter(this, listMovie);
         recyclerViewMainMovie.setAdapter(rvAdapter);
-        implementLoader(option);
+        implementMovieLoader(option);
         ImplementEndlessRecyclerViewScrollListener();
     }
     public void cleanData(){
@@ -68,19 +68,21 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
             currentPage = 1;
         }
     }
-    public void implementLoader(int option){
+    //Load movie details
+    public void implementMovieLoader(int option){
         // Create URL
         this.option = option;
         url = new URLCreate(this.option,currentPage).joinURLPath();
+
         //  Using loader
-        LoaderManager loaderManager = activity.getLoaderManager();
         if(checkInternetConnection()){
-            loaderManager.initLoader(StoreContract.MOVIE_LOADER_ID,null,this).forceLoad();
+            loaderManager.initLoader(StoreContract.MOVIE_LOADER_ID,null,this);
         }else {
             loadingIndicator.setVisibility(View.GONE);
             showErrorMessage(view.getString(R.string.no_connection));
         }
     }
+
     private boolean checkInternetConnection(){
         //Check the internet connection
         ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -118,8 +120,7 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        Intent intent = new Intent(activity,MovieDetails.class );
-
+        Intent intent = new Intent(activity,MovieDetailsActivity.class);
         Movie movie = listMovie.get(clickedItemIndex);
         intent.putExtra("MoviesObject", movie);
         activity.startActivity(intent);

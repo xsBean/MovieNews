@@ -6,7 +6,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import d.manh.movienow.models.Movie;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
-public class QueryUtils {
+public final class QueryUtils {
     private static final String LOG_TAG = QueryUtils.class.getSimpleName();
 
     private QueryUtils(){}
@@ -67,11 +67,6 @@ public class QueryUtils {
 
     public static ArrayList<Movie> fetchMovieData(URL requestUrl) throws IOException {
         String jsonResponse = makeHttpRequest(requestUrl);
-//        try {
-//            Thread.sleep(2000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         return extractMovies(jsonResponse);
     }
 
@@ -85,18 +80,13 @@ public class QueryUtils {
         // Create an empty ArrayList that we can start adding earthquakes to
         ArrayList<Movie> movieArrayList = new ArrayList<>();
 
-        // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
-        // is formatted, a JSONException exception object will be thrown.
-        // Catch the exception so the app doesn't crash, and print the error message to the logs.
         try {
 
-            // TODO: Parse the response given by the SAMPLE_JSON_RESPONSE string and
-            // build up a list of Earthquake objects with the corresponding data.
-            // String JSONResponse = makeHttpRequest(url);
             JSONObject root = new JSONObject(JSONResponse);
             JSONArray jsonResults = root.getJSONArray("results");
             for (int i = 0 ; i < jsonResults.length();i++){
                 JSONObject jsonCurrent = jsonResults.getJSONObject(i);
+                int movieID = jsonCurrent.getInt("id");
                 String posterPath = jsonCurrent.getString("poster_path");
                 String title = jsonCurrent.getString("original_title");
                 String backdropPath = jsonCurrent.getString("backdrop_path");
@@ -104,7 +94,7 @@ public class QueryUtils {
                 String releaseDate = jsonCurrent.getString("release_date");
                 Double rating = jsonCurrent.getDouble("vote_average");
 
-                movieArrayList.add(new Movie(posterPath,backdropPath, title, releaseDate, rating, description, null,null));
+                movieArrayList.add(new Movie(movieID,posterPath,backdropPath, title, releaseDate, rating, description, null, null));
             }
 
         } catch (JSONException e) {
