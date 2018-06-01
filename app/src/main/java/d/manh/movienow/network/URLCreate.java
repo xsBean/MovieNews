@@ -12,7 +12,7 @@ public class URLCreate{
     private int option;
     private int page;
 
-    public URLCreate(int option, int page){
+    URLCreate(int option, int page){
         this.option = option;
         this.page = page;
     }

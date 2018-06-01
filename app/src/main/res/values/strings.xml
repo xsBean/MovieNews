@@ -17,4 +17,5 @@
     <string name="movie_detail">Movie Details</string>
     <string name="no_connection">No Intenet Connection</string>
     <string name="no_data">No Data</string>
+    <string name="favorite">Favorite</string>
 </resources>

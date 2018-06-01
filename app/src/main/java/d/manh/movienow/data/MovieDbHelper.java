@@ -14,12 +14,14 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         // Create movies table
-        final String CREATE_TABLE = "CREATE TABLE "     + StoreContract.TABLE_MOVIE + " (" +
-                StoreContract._ID                       + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                StoreContract.COLUMN_MOVIE_TITLES       + " TEXT NOT NULL, " +
-                StoreContract.COLUMN_MOVIE_RELEASE_DATE + " TEXT NOT NULL, " +
-                StoreContract.COLUMN_MOVIE_RATING       + " REAL NOT NULL, " +
-                StoreContract.COLUMN_MOVIE_SUMMARY      + " TEXT NOT NULL);";
+        final String CREATE_TABLE = "CREATE TABLE "             + StoreContract.TABLE_MOVIE + " (" +
+                StoreContract.COLUMN_MOVIE_ID                   + " INTEGER PRIMARY KEY, " +
+                StoreContract.COLUMN_MOVIE_TITLES               + " TEXT NOT NULL, " +
+                StoreContract.COLUMN_MOVIE_RELEASE_DATE         + " TEXT NOT NULL, " +
+                StoreContract.COLUMN_MOVIE_RATING               + " REAL NOT NULL, " +
+                StoreContract.COLUMN_MOVIE_POSTER_PATH          + " TEXT NOT NULL, " +
+                StoreContract.COLUMN_MOVIE_BACKGROUND_IMAGE_PATH    + " TEXT NOT NULL, " +
+                StoreContract.COLUMN_MOVIE_SUMMARY              + " TEXT NOT NULL);";
         db.execSQL(CREATE_TABLE);
     }
 

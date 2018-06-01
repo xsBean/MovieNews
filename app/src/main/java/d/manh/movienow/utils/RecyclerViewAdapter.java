@@ -39,9 +39,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-//        holder.ivImageMovie.setImageResource(R.);
-//        String url =  "http://image.tmdb.org/t/p/w185/"+listMovie.get(position).getPosterPath();
-//        Log.v("URL",url);
+
         String url = StoreContract.URL_IMAGE + StoreContract.URL_PATH_POSTER_SIZE +listMovie.get(position).getPosterPath();
         Picasso.with(context).load(url).into(holder.ivImageMovie);
         holder.tvMovieTitle.setText(listMovie.get(position).getTitle());

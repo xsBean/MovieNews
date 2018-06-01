@@ -55,12 +55,12 @@ public class Movie implements Parcelable {
         }
     };
 
-    public void setMovieId(int id) {this.movieId = id;}
+//    public void setMovieId(int id) {this.movieId = id;}
     public int getMovieId() {
         return movieId;
     }
     public void setReviews(ArrayList<Review> reviews){ this.reviews = reviews;}
-    public ArrayList getReviews() {
+    public ArrayList<Review> getReviews() {
         return reviews;
     }
 
@@ -68,9 +68,9 @@ public class Movie implements Parcelable {
         return backgroundPath;
     }
 
-    public void setBackgroundPath(String backgroundPath) {
-        this.backgroundPath = backgroundPath;
-    }
+//    public void setBackgroundPath(String backgroundPath) {
+//        this.backgroundPath = backgroundPath;
+//    }
 
     public String getReleaseDate() {
         return releaseDate;
@@ -84,7 +84,7 @@ public class Movie implements Parcelable {
         this.rating = rating;
     }
 
-    public ArrayList getTrailers() {
+    public ArrayList<Trailer> getTrailers() {
         return trailers;
     }
 

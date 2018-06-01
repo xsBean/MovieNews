@@ -5,31 +5,40 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import d.manh.movienow.MainActivity;
 import d.manh.movienow.MovieDetailsActivity;
+import d.manh.movienow.data.MovieDbHelper;
 import d.manh.movienow.utils.ListItemClickListener;
 import d.manh.movienow.models.Movie;
 import d.manh.movienow.utils.RecyclerViewAdapter;
 import d.manh.movienow.data.StoreContract;
 import d.manh.movienow.R;
+import d.manh.movienow.utils.RecyclerViewAdapterCursor;
 
-public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>, ListItemClickListener {
+public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>, ListItemClickListener{
     private String TAG = "NetworkModule";
     private RecyclerView recyclerViewMainMovie;
     private List<Movie> listMovie = new ArrayList<>();
     private RecyclerViewAdapter rvAdapter;
+    private RecyclerViewAdapterCursor rvAdapterCursor;
     private MainActivity view;
     private Activity activity;
     private Context context;
@@ -38,6 +47,7 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
     private URL url;
     private int option;
     private LoaderManager loaderManager;
+    private Cursor cursor;
 
     // Store a member variable for the listener
     private boolean itShouldLoadMore = true;
@@ -52,15 +62,12 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
         loadingIndicator =  view.findViewById(R.id.pb_loading_indicator);
         recyclerViewMainMovie = view.findViewById(R.id.rv_contain_main);
     }
-    public void firstLoadData(int option){
-        // Create Layout manager and add to RecyclerView
-        recyclerViewMainMovie.setLayoutManager(new GridLayoutManager(context,3));
-        recyclerViewMainMovie.setHasFixedSize(true);
-        rvAdapter = new RecyclerViewAdapter(this, listMovie);
-        recyclerViewMainMovie.setAdapter(rvAdapter);
-        implementMovieLoader(option);
-        ImplementEndlessRecyclerViewScrollListener();
-    }
+//    public static NetworkModule getInstance(MainActivity view, Activity activity, Context context){
+//        if(classNetworkModel == null){
+//            classNetworkModel = new NetworkModule(view,activity,context);
+//        }
+//        return classNetworkModel;
+//    }
     public void cleanData(){
         //clear data
         if(!listMovie.isEmpty()) {
@@ -68,22 +75,66 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
             currentPage = 1;
         }
     }
-    //Load movie details
-    public void implementMovieLoader(int option){
-        // Create URL
-        this.option = option;
-        url = new URLCreate(this.option,currentPage).joinURLPath();
 
-        //  Using loader
-        if(checkInternetConnection()){
-            loaderManager.initLoader(StoreContract.MOVIE_LOADER_ID,null,this);
-        }else {
-            loadingIndicator.setVisibility(View.GONE);
-            showErrorMessage(view.getString(R.string.no_connection));
-        }
+    public int getCurrentPage() {
+        return currentPage;
     }
 
-    private boolean checkInternetConnection(){
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public void setUp(ArrayList<Movie> listMovie, int option){
+        if(recyclerViewMainMovie == null){
+            recyclerViewMainMovie = activity.findViewById(R.id.rv_contain_main);
+        }
+        if(listMovie != null && option !=3){
+            this.listMovie = listMovie;
+
+            this.rvAdapter = new RecyclerViewAdapter(this,this.listMovie);
+            recyclerViewMainMovie.setAdapter(rvAdapter);
+        }else if(option == 3){
+            this.rvAdapterCursor = new RecyclerViewAdapterCursor(context,cursor,this);
+            recyclerViewMainMovie.setAdapter(rvAdapterCursor);
+        }
+        this.option = option;
+        ImplementEndlessRecyclerViewScrollListener();
+    }
+
+    public void firstLoadData(int option){
+        // Create Layout manager and add to RecyclerView
+
+        rvAdapter = new RecyclerViewAdapter(this, this.listMovie);
+        recyclerViewMainMovie.setAdapter(rvAdapter);
+        //Load from internet
+        if(option != 3){
+            this.option = option;
+            implementMovieLoader();
+        }
+        //Load from database
+        else{
+            this.option = option;
+            cursor = getAllMovie();
+            rvAdapterCursor = new RecyclerViewAdapterCursor(context,cursor,this);
+            recyclerViewMainMovie.setAdapter(rvAdapterCursor);
+        }
+
+        ImplementEndlessRecyclerViewScrollListener();
+    }
+//    public void notifyCursorChange(){
+//        this.cursor = getAllMovie();
+//        rvAdapterCursor.swapCursor(cursor);
+//    }
+
+    //Load movie details
+    private void implementMovieLoader(){
+        // Create URL
+        url = new URLCreate(this.option,currentPage).joinURLPath();
+        //  Using loader
+        loaderManager.initLoader(StoreContract.MOVIE_LOADER_ID,null,this);
+    }
+
+    public boolean checkInternetConnection(){
         //Check the internet connection
         ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         assert connMgr != null;
@@ -94,7 +145,6 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
     @Override
     public Loader<List<Movie>> onCreateLoader(int id, Bundle args) {
         loadingIndicator.setVisibility(View.VISIBLE);
-
         return new MovieLoader(context, url);
     }
 
@@ -121,8 +171,41 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
     @Override
     public void onListItemClick(int clickedItemIndex) {
         Intent intent = new Intent(activity,MovieDetailsActivity.class);
-        Movie movie = listMovie.get(clickedItemIndex);
-        intent.putExtra("MoviesObject", movie);
+        Movie movie;
+        if(option != 3){
+            Bitmap bm = generateBitmapFromImageView(clickedItemIndex);
+            // Convert Bitmap to byte array
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bm.compress(Bitmap.CompressFormat.JPEG,100,stream);
+            byte[] byteArray = stream.toByteArray();
+
+            //Create intent
+
+            movie = listMovie.get(clickedItemIndex);
+            intent.putExtra("MoviesObject", movie);
+            intent.putExtra("identify",option);
+            intent.putExtra("poster",byteArray);
+        }else {
+            // open DBHelper to read cursor
+            MovieDbHelper dbHelper = new MovieDbHelper(context);
+            dbHelper.getReadableDatabase();
+
+            cursor.moveToPosition(clickedItemIndex);
+            String title = cursor.getString(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_TITLES));
+            String backgroundPath = cursor.getString(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_BACKGROUND_IMAGE_PATH));
+            String summary =cursor.getString(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_SUMMARY));
+            Double rate = cursor.getDouble(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_RATING));
+            String releaseDate = cursor.getString(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_RELEASE_DATE));
+            int movieId = cursor.getInt(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_ID));
+            movie = new Movie(movieId,null,backgroundPath,title,releaseDate, rate,summary,null,null);
+
+            intent.putExtra("MoviesObject", movie);
+            intent.putExtra("identify",option);
+
+            // Close DBHelper
+//            cursor.close();
+            dbHelper.close();
+        }
         activity.startActivity(intent);
         Toast toast = Toast.makeText(activity,movie.getTitle(),Toast.LENGTH_LONG);
         toast.show();
@@ -179,5 +262,26 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
             showErrorMessage(view.getString(R.string.no_connection));
         }
     }
+    private Bitmap generateBitmapFromImageView(int clickPosition){
 
+        RecyclerView.ViewHolder viewHolder = recyclerViewMainMovie.findViewHolderForAdapterPosition(clickPosition);
+        ImageView imageView = viewHolder.itemView.findViewById(R.id.iv_movie_image);
+
+        //Get background image from toolbar then save it to bitmap
+        BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+        return drawable.getBitmap();
+    }
+    private Cursor getAllMovie(){
+
+        Uri queryUri = StoreContract.CONTENT_URI;
+        return context.getContentResolver().query(queryUri,null,null,null,null);
+    }
+    public ArrayList<Movie> getData(){
+        return (ArrayList<Movie>) listMovie;
+    }
+
+    public void swapCursorAdapter() {
+        this.cursor = getAllMovie();
+        rvAdapterCursor.swapCursor(cursor);
+    }
 }

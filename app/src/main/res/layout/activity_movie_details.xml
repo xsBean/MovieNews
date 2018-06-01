@@ -73,6 +73,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
+                android:visibility="gone"
                 android:text="@string/trailers"/>
             <include
                 layout="@layout/trailers"
@@ -83,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
+                android:visibility="gone"
                 android:text="@string/review_tag"/>
             <include
                 layout="@layout/reviews"
@@ -98,10 +100,12 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:src="@drawable/ic_favorite_border_white_24dp"
+        android:onClick="fbOnClick"
         app:elevation="6dp"
         app:layout_anchor="@id/scrolling_container"
         app:layout_anchorGravity="bottom|right|end"
         app:pressedTranslationZ="12dp"
         app:rippleColor="@android:color/white"/>
+
 
 </android.support.design.widget.CoordinatorLayout>

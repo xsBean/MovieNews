@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_USER_DICTIONARY"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 
     <application
         android:allowBackup="true"
@@ -14,6 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="d.manh.movienow.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
@@ -33,6 +37,10 @@
                 android:value="d.manh.movienow.MainActivity"
                 />
         </activity>
+        <provider
+            android:authorities="d.manh.movienow"
+            android:name=".data.MovieContainProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
