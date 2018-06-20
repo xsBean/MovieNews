@@ -53,6 +53,7 @@ public class RecyclerViewAdapterCursor extends RecyclerView.Adapter<RecyclerView
     }
     @Override
     public int getItemCount() {
+        if(cursor == null) return 0;
         return cursor.getCount();
     }
 
@@ -65,6 +66,10 @@ public class RecyclerViewAdapterCursor extends RecyclerView.Adapter<RecyclerView
             // Force the RecyclerView to refresh
             this.notifyDataSetChanged();
         }
+    }
+
+    public Cursor getCursor() {
+        return cursor;
     }
 
     public class MyViewHolderCursor extends RecyclerView.ViewHolder  implements View.OnClickListener {

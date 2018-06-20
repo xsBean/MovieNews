@@ -33,7 +33,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import d.manh.movienow.models.Movie;
 import d.manh.movienow.models.Review;
 import d.manh.movienow.models.Trailer;
@@ -268,10 +267,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements ListItemC
         Uri queryUri = StoreContract.CONTENT_URI;
         Cursor cursor = getContentResolver().query(queryUri,null,selection,selectionArgs,sortOrder);
 
-        if(cursor != null) {
+        if(cursor != null && cursor.moveToFirst() ) {
 
             // Build appropriate uri with String row id appended
-            cursor.moveToFirst();
             int idIndex = cursor.getInt(0);
             String stringId = Integer.toString(idIndex);
             Uri uri = StoreContract.CONTENT_URI;
@@ -283,7 +281,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements ListItemC
                 deleteImageFile(posterPath);
                 deleteImageFile(backgroundPath);
                 Toast.makeText(this, "Removed the movie from the favorite lists", Toast.LENGTH_SHORT).show();
-
             }
             else {
                 Toast.makeText(this, "Cannot remove the movie from the favorite lists", Toast.LENGTH_SHORT).show();

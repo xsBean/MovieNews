@@ -2,6 +2,7 @@ package d.manh.movienow.network;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -42,8 +43,6 @@ public class ReviewAndTrailerLoader extends AsyncTaskLoader<Movie> {
     public Movie loadInBackground() {
         fetchTrailers();
         fetchReviews();
-//        movie.setTrailers(trailers);
-//        movie.setReviews(reviews);
         return movie;
     }
 
@@ -56,18 +55,18 @@ public class ReviewAndTrailerLoader extends AsyncTaskLoader<Movie> {
         Call<TrailerWrapper> callTrailerWrapper = apiTrailer.getTrailerWrapper("" + movie.getMovieId());
         callTrailerWrapper.enqueue(new Callback<TrailerWrapper>() {
             @Override
-            public void onResponse(Call<TrailerWrapper> call, Response<TrailerWrapper> response) {
+            public void onResponse(@NonNull Call<TrailerWrapper> call, @NonNull Response<TrailerWrapper> response) {
                 TrailerWrapper trailerWrapper = response.body();
+                assert trailerWrapper != null;
                 trailers = trailerWrapper.getResults();
                 movie.setTrailers(trailers);
                 loadReviewAndTrailerInt.loadTrailer(trailers);
             }
             @Override
-            public void onFailure(Call<TrailerWrapper> call, Throwable t) {
+            public void onFailure(Call<TrailerWrapper> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(),t.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
-//        return null;
     }
 
     private void fetchReviews() {
@@ -79,21 +78,18 @@ public class ReviewAndTrailerLoader extends AsyncTaskLoader<Movie> {
         Call<ReviewWrapper> callReview = apiReview.getReviewWrapper(""+movie.getMovieId());
         callReview.enqueue(new Callback<ReviewWrapper>() {
             @Override
-            public void onResponse(Call<ReviewWrapper> call, Response<ReviewWrapper> response) {
+            public void onResponse(@NonNull Call<ReviewWrapper> call, @NonNull Response<ReviewWrapper> response) {
                 ReviewWrapper reviewWrapper = response.body();
+                assert reviewWrapper != null;
                 reviews = reviewWrapper.getResults();
                 movie.setReviews(reviews);
                 loadReviewAndTrailerInt.loadReview(reviews);
-//
-//                for ( Review review : reviews){
-//                    Log.v("Review: ", review.getAuthor());
-//                }
+
             }
             @Override
-            public void onFailure(Call<ReviewWrapper> call, Throwable t) {
+            public void onFailure(@NonNull Call<ReviewWrapper> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(),t.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }
-//    private up
 }

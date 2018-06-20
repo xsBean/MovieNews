@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import d.manh.movienow.MainActivity;
 import d.manh.movienow.MovieDetailsActivity;
+import d.manh.movienow.data.DatabaseLoader;
 import d.manh.movienow.data.MovieDbHelper;
 import d.manh.movienow.utils.ListItemClickListener;
 import d.manh.movienow.models.Movie;
@@ -47,11 +48,10 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
     private URL url;
     private int option;
     private LoaderManager loaderManager;
-    private Cursor cursor;
-
     // Store a member variable for the listener
     private boolean itShouldLoadMore = true;
     private int currentPage = 1;
+    private Cursor cursor;
 
     public NetworkModule(MainActivity view, Activity activity,Context context){
         this.view = view;
@@ -62,12 +62,7 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
         loadingIndicator =  view.findViewById(R.id.pb_loading_indicator);
         recyclerViewMainMovie = view.findViewById(R.id.rv_contain_main);
     }
-//    public static NetworkModule getInstance(MainActivity view, Activity activity, Context context){
-//        if(classNetworkModel == null){
-//            classNetworkModel = new NetworkModule(view,activity,context);
-//        }
-//        return classNetworkModel;
-//    }
+
     public void cleanData(){
         //clear data
         if(!listMovie.isEmpty()) {
@@ -114,17 +109,24 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
         //Load from database
         else{
             this.option = option;
-            cursor = getAllMovie();
+//            cursor = getAllMovie();
+//
+//            if(cursor == null || cursor.moveToFirst()){
+//                recyclerViewMainMovie.setVisibility(View.GONE);
+//                tvErrorMessage.setText(activity.getResources().getString(R.string.no_data));
+//                tvErrorMessage.setVisibility(View.VISIBLE);
+//            }else{
+//                recyclerViewMainMovie.setVisibility(View.VISIBLE);
+//                tvErrorMessage.setVisibility(View.GONE);
+//                rvAdapterCursor = new RecyclerViewAdapterCursor(context,cursor,this);
+//                recyclerViewMainMovie.setAdapter(rvAdapterCursor);
+//            }
             rvAdapterCursor = new RecyclerViewAdapterCursor(context,cursor,this);
             recyclerViewMainMovie.setAdapter(rvAdapterCursor);
+            loaderManager.initLoader(StoreContract.MOVIE_CURSOR_LOADER_ID, null, new DatabaseLoader((MainActivity) activity));
         }
-
         ImplementEndlessRecyclerViewScrollListener();
     }
-//    public void notifyCursorChange(){
-//        this.cursor = getAllMovie();
-//        rvAdapterCursor.swapCursor(cursor);
-//    }
 
     //Load movie details
     private void implementMovieLoader(){
@@ -189,7 +191,8 @@ public class NetworkModule implements LoaderManager.LoaderCallbacks<List<Movie>>
             // open DBHelper to read cursor
             MovieDbHelper dbHelper = new MovieDbHelper(context);
             dbHelper.getReadableDatabase();
-
+            rvAdapterCursor = (RecyclerViewAdapterCursor) recyclerViewMainMovie.getAdapter();
+            cursor = rvAdapterCursor.getCursor();
             cursor.moveToPosition(clickedItemIndex);
             String title = cursor.getString(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_TITLES));
             String backgroundPath = cursor.getString(cursor.getColumnIndex(StoreContract.COLUMN_MOVIE_BACKGROUND_IMAGE_PATH));
